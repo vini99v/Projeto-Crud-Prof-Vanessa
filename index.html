@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque Tempero da Casa</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --azul: #007bff;
+            --roxo: #6f42c1;
+            --verde: #28a745;
+            --vermelho: #dc3545;
+            --cinza-claro: #f8f9fa;
+            --cinza: #343a40;
+            --branco: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--cinza-claro);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(90deg, var(--azul), var(--roxo));
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.4rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            background: white;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .botoes {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .botoes button {
+            background: linear-gradient(90deg, var(--azul), var(--roxo));
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .botoes button:hover {
+            transform: scale(1.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: linear-gradient(90deg, var(--azul), var(--roxo));
+            color: white;
+        }
+
+        tr:hover {
+            background-color: var(--cinza-claro);
+        }
+
+        .actions button {
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 6px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .actions button:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-consumir { background-color: var(--azul); }
+        .btn-repor { background-color: var(--verde); }
+        .btn-remover { background-color: var(--vermelho); }
+
+        .grafico {
+            margin-top: 40px;
+        }
+
+        footer {
+            text-align: center;
+            margin: 30px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Estoque Tempero da Casa</h1>
+</header>
+
+<div class="container">
+    <div class="botoes">
+        <button onclick="adicionarProduto()">➕ Adicionar Produto</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabelaProdutos"></tbody>
+    </table>
+
+    <div class="grafico">
+        <canvas id="graficoEstoque"></canvas>
+    </div>
+</div>
+
+<footer>
+    Estoque Tempero da Casa 🍽️
+</footer>
+
+<script>
+    let produtos = [
+        { nome: 'Hambúrguer', quantidade: 25 },
+        { nome: 'Pizza de Calabresa', quantidade: 15 },
+        { nome: 'Batata Frita', quantidade: 30 },
+        { nome: 'Refrigerante Lata', quantidade: 50 },
+        { nome: 'Cerveja Long Neck', quantidade: 20 },
+        { nome: 'Salada Caesar', quantidade: 12 },
+    ];
+
+    let grafico;
+
+    function atualizarTabela() {
+        const tabela = document.getElementById('tabelaProdutos');
+        tabela.innerHTML = '';
+
+        produtos.forEach((produto, index) => {
+            const row = `
+                <tr>
+                    <td>${produto.nome}</td>
+                    <td>${produto.quantidade}</td>
+                    <td class="actions">
+                        <button class="btn-consumir" onclick="consumirProduto(${index})">Consumir</button>
+                        <button class="btn-repor" onclick="reporProduto(${index})">Repor</button>
+                        <button class="btn-remover" onclick="removerProduto(${index})">Remover</button>
+                    </td>
+                </tr>
+            `;
+            tabela.innerHTML += row;
+        });
+
+        atualizarGrafico();
+    }
+
+    function adicionarProduto() {
+        const nome = prompt('Digite o nome do produto:');
+        if (!nome) return;
+
+        const quantidade = parseInt(prompt('Digite a quantidade inicial:'));
+        if (isNaN(quantidade) || quantidade <= 0) {
+            alert('Quantidade inválida.');
+            return;
+        }
+
+        produtos.push({ nome, quantidade });
+        atualizarTabela();
+    }
+
+    function consumirProduto(index) {
+        const quantidade = parseInt(prompt(`Quantidade a consumir de "${produtos[index].nome}":`));
+
+        if (isNaN(quantidade) || quantidade <= 0) {
+            alert('Digite um valor válido!');
+            return;
+        }
+
+        if (quantidade > produtos[index].quantidade) {
+            alert('Quantidade insuficiente no estoque!');
+            return;
+        }
+
+        produtos[index].quantidade -= quantidade;
+        atualizarTabela();
+    }
+
+    function reporProduto(index) {
+        const quantidade = parseInt(prompt(`Quantidade a repor de "${produtos[index].nome}":`));
+
+        if (isNaN(quantidade) || quantidade <= 0) {
+            alert('Digite um valor válido!');
+            return;
+        }
+
+        produtos[index].quantidade += quantidade;
+        atualizarTabela();
+    }
+
+    function removerProduto(index) {
+        if (confirm(`Deseja remover "${produtos[index].nome}" do estoque?`)) {
+            produtos.splice(index, 1);
+            atualizarTabela();
+        }
+    }
+
+    function atualizarGrafico() {
+        const ctx = document.getElementById('graficoEstoque').getContext('2d');
+        const labels = produtos.map(p => p.nome);
+        const dados = produtos.map(p => p.quantidade);
+
+        if (grafico) {
+            grafico.destroy();
+        }
+
+        grafico = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Estoque',
+                    data: dados,
+                    backgroundColor: [
+                        '#007bff', '#6f42c1', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#fd7e14', '#6610f2'
+                    ],
+                    borderColor: 'white',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    atualizarTabela();
+</script>
+
+</body>
+</html>
+
