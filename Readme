@@ -1,0 +1,40 @@
+# Estoque Tempero da Casa
+
+Sistema simples de controle de estoque para restaurante, feito 100% em HTML, CSS e JavaScript.  
+Funciona direto no navegador, sem backend.
+
+## Funcionalidades
+
+- Adicionar produto ao estoque  
+- Consumir quantidade do estoque  
+- Repor quantidade ao estoque  
+- Remover produto  
+- Gráfico dinâmico mostrando o estoque atual
+
+## Como usar
+
+1. Abra o arquivo `index.html` em qualquer navegador moderno.  
+2. Use os botões para gerenciar seu estoque.  
+
+## Tecnologias usadas
+
+- HTML5  
+- CSS3  
+- JavaScript  
+- Chart.js para o gráfico
+
+## Autor
+
+[vini99v](https://github.com/vini99v)
+
+---
+
+### Para contribuir
+
+Clone o projeto, faça alterações e envie seu pull request.
+
+---
+
+### Licença
+
+Este projeto está sob a licença MIT.  
